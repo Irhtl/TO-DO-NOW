@@ -1,0 +1,180 @@
+name: Convert HTML to Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Android WebView APK Builder
+      run: |
+        # ایجاد یک پروژه اندروید ساده با WebView
+        mkdir -p html-to-apk/app/src/main/assets
+        mkdir -p html-to-apk/app/src/main/res
+        mkdir -p html-to-apk/app/src/main/java/com/yourcompany/todoapp
+        
+        # کپی فایل HTML شما
+        cp index.html html-to-apk/app/src/main/assets/
+        
+    - name: Create Android project files
+      run: |
+        # ایجاد AndroidManifest.xml
+        cat > html-to-apk/app/src/main/AndroidManifest.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="com.yourcompany.todoapp">
+            
+            <uses-permission android:name="android.permission.INTERNET" />
+            
+            <application
+                android:allowBackup="true"
+                android:icon="@mipmap/ic_launcher"
+                android:label="لیست کارها"
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+                
+                <activity
+                    android:name=".MainActivity"
+                    android:exported="true"
+                    android:configChanges="orientation|keyboardHidden|screenSize">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
+            </application>
+        </manifest>
+        EOF
+        
+        # ایجاد MainActivity.java
+        cat > html-to-apk/app/src/main/java/com/yourcompany/todoapp/MainActivity.java << 'EOF'
+        package com.yourcompany.todoapp;
+        
+        import android.os.Bundle;
+        import android.webkit.WebSettings;
+        import android.webkit.WebView;
+        import android.webkit.WebViewClient;
+        import androidx.appcompat.app.AppCompatActivity;
+        
+        public class MainActivity extends AppCompatActivity {
+            @Override
+            protected void onCreate(Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.activity_main);
+                
+                WebView webView = findViewById(R.id.webview);
+                WebSettings webSettings = webView.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                webSettings.setDomStorageEnabled(true);
+                webSettings.setDatabaseEnabled(true);
+                
+                webView.setWebViewClient(new WebViewClient());
+                webView.loadUrl("file:///android_asset/index.html");
+            }
+        }
+        EOF
+        
+        # ایجاد activity_main.xml
+        mkdir -p html-to-apk/app/src/main/res/layout
+        cat > html-to-apk/app/src/main/res/layout/activity_main.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <WebView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        EOF
+        
+    - name: Create Gradle files
+      run: |
+        # ایجاد build.gradle (app)
+        cat > html-to-apk/app/build.gradle << 'EOF'
+        plugins {
+            id 'com.android.application'
+        }
+        
+        android {
+            namespace 'com.yourcompany.todoapp'
+            compileSdk 33
+            
+            defaultConfig {
+                applicationId "com.yourcompany.todoapp"
+                minSdk 21
+                targetSdk 33
+                versionCode 1
+                versionName "1.0"
+            }
+            
+            buildTypes {
+                release {
+                    minifyEnabled false
+                    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                }
+            }
+            
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_1_8
+                targetCompatibility JavaVersion.VERSION_1_8
+            }
+        }
+        
+        dependencies {
+            implementation 'androidx.appcompat:appcompat:1.6.1'
+            implementation 'com.google.android.material:material:1.9.0'
+            implementation 'androidx.webkit:webkit:1.7.0'
+        }
+        EOF
+        
+        # ایجاد build.gradle (project)
+        cat > html-to-apk/build.gradle << 'EOF'
+        buildscript {
+            repositories {
+                google()
+                mavenCentral()
+            }
+            dependencies {
+                classpath 'com.android.tools.build:gradle:7.4.2'
+            }
+        }
+        
+        allprojects {
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        
+        task clean(type: Delete) {
+            delete rootProject.buildDir
+        }
+        EOF
+        
+        # ایجاد gradle.properties
+        cat > html-to-apk/gradle.properties << 'EOF'
+        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+        android.useAndroidX=true
+        android.enableJetifier=true
+        EOF
+        
+        # ایجاد gradlewrapper
+        cd html-to-apk
+        gradle wrapper --gradle-version=7.5
+        cd ..
+        
+    - name: Build APK
+      run: |
+        cd html-to-apk
+        chmod +x gradlew
+        ./gradlew assembleDebug
+        
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: todo-app-apk
+        path: html-to-apk/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
