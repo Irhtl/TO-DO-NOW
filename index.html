@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت کارها</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* رنگ‌های حالت روشن */
+            --light-bg: #F5F7FA;
+            --light-card: #FFFFFF;
+            --light-text: #2D3748;
+            --light-text-secondary: #718096;
+            --light-border: #E2E8F0;
+            --light-primary: #4F46E5;
+            --light-success: #10B981;
+            --light-warning: #F59E0B;
+            --light-danger: #EF4444;
+            --light-purple: #8B5CF6;
+            --light-pink: #EC4899;
+            --light-blue: #3B82F6;
+            --light-green: #10B981;
+            --light-yellow: #F59E0B;
+            --light-orange: #F97316;
+            
+            /* رنگ‌های حالت تیره */
+            --dark-bg: #1A202C;
+            --dark-card: #2D3748;
+            --dark-text: #F7FAFC;
+            --dark-text-secondary: #CBD5E0;
+            --dark-border: #4A5568;
+            --dark-primary: #6366F1;
+            --dark-success: #34D399;
+            --dark-warning: #FBBF24;
+            --dark-danger: #F87171;
+            --dark-purple: #A78BFA;
+            --dark-pink: #F472B6;
+            --dark-blue: #60A5FA;
+            --dark-green: #34D399;
+            --dark-yellow: #FBBF24;
+            --dark-orange: #FB923C;
+            
+            /* رنگ‌های فعلی */
+            --bg-color: var(--light-bg);
+            --card-color: var(--light-card);
+            --text-color: var(--light-text);
+            --text-secondary: var(--light-text-secondary);
+            --border-color: var(--light-border);
+            --primary-color: var(--light-primary);
+            --success-color: var(--light-success);
+            --warning-color: var(--light-warning);
+            --danger-color: var(--light-danger);
+            --purple-color: var(--light-purple);
+            --pink-color: var(--light-pink);
+            --blue-color: var(--light-blue);
+            --green-color: var(--light-green);
+            --yellow-color: var(--light-yellow);
+            --orange-color: var(--light-orange);
+            
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* صفحه بارگذاری */
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        /* هدر */
+        .header {
+            background-color: var(--card-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--primary-color);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .menu-button:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .header-info {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .theme-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* فرم افزودن کار */
+        .add-form {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .task-input {
+            flex: 1;
+            height: 50px;
+            border-radius: 10px;
+            padding: 0 15px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-align: right;
+            transition: var(--transition);
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .add-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 10px;
+            transition: var(--transition);
+        }
+
+        .add-button:hover:not(:disabled) {
+            background-color: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        .add-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .description-input {
+            width: 100%;
+            height: 80px;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-align: right;
+            margin-bottom: 20px;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .description-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .label {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* دسته‌بندی‌ها */
+        .category-scroll {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            gap: 10px;
+        }
+
+        .category-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .category-scroll::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 3px;
+        }
+
+        .category-scroll::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .category-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border-color);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .category-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .category-option.active {
+            border-width: 2px;
+            font-weight: 600;
+        }
+
+        .category-option i {
+            margin-left: 8px;
+            font-size: 18px;
+        }
+
+        /* اولویت‌ها */
+        .priority-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .priority-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .priority-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .priority-option.active {
+            border-width: 2px;
+            font-weight: 600;
+        }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        /* تاریخ و زمان */
+        .datetime-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .datetime-column {
+            flex: 1;
+        }
+
+        .date-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            cursor: pointer;
+            padding: 0 15px;
+            transition: var(--transition);
+        }
+
+        .date-button:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+
+        .date-button i {
+            color: var(--primary-color);
+            margin-left: 10px;
+            font-size: 20px;
+        }
+
+        /* فیلترها */
+        .filter-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 15px 15px;
+            gap: 10px;
+        }
+
+        .filter-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .filter-scroll::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 3px;
+        }
+
+        .filter-scroll::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .filter-button {
+            padding: 12px 25px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border-color);
+            background-color: var(--card-color);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .filter-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .filter-button.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* کارها */
+        .task-list {
+            padding: 0 15px;
+            margin-bottom: 40px;
+        }
+
+        .list-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .list-header {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .save-warning {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning-color);
+            font-size: 12px;
+            color: var(--warning-color);
+        }
+
+        .save-warning i {
+            margin-left: 5px;
+        }
+
+        .task-item {
+            display: flex;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-color);
+            margin-bottom: 12px;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .checkbox {
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .task-title.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .category-badge {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .category-badge i {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+
+        .task-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-align: right;
+            line-height: 1.7;
+        }
+
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .meta-item i {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+
+        .priority-dot-small {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+
+        .delete-button {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            margin-right: 5px;
+        }
+
+        .delete-button:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* حالت خالی */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .empty-state-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .empty-state-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .guest-warning {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--warning-color);
+            background-color: rgba(245, 158, 11, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .guest-warning i {
+            color: var(--warning-color);
+            margin-left: 15px;
+            font-size: 20px;
+        }
+
+        .guest-warning-text {
+            font-size: 14px;
+            color: var(--warning-color);
+            text-align: right;
+            flex: 1;
+        }
+
+        /* منوی کشویی */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .menu-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 300px;
+            max-width: 85%;
+            background-color: var(--card-color);
+            padding: 60px 20px 20px;
+            overflow-y: auto;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-container.show {
+            transform: translateX(0);
+        }
+
+        .menu-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* استایل‌های منو */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .user-info i {
+            font-size: 80px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-top: 10px;
+        }
+
+        .user-email {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .user-stats {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .menu-items {
+            margin-bottom: 30px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .menu-item i {
+            color: var(--text-secondary);
+            font-size: 24px;
+            margin-left: 15px;
+        }
+
+        .menu-item-text {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .logout-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 10px;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: var(--transition);
+            margin-top: auto;
+        }
+
+        .logout-button:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .logout-button i {
+            margin-left: 10px;
+        }
+
+        /* فرم احراز هویت */
+        .auth-menu {
+            flex: 1;
+        }
+
+        .menu-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .menu-header i {
+            font-size: 60px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .menu-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-top: 15px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .input-icon {
+            color: var(--text-secondary);
+            margin: 0 15px;
+            font-size: 20px;
+        }
+
+        .menu-input {
+            flex: 1;
+            height: 50px;
+            padding: 0 10px;
+            font-size: 16px;
+            border: none;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-align: right;
+        }
+
+        .menu-input:focus {
+            outline: none;
+        }
+
+        .menu-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .menu-auth-button {
+            height: 50px;
+            border-radius: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        .menu-auth-button:hover {
+            background-color: #4338CA;
+        }
+
+        .switch-auth-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .switch-auth-text {
+            color: var(--primary-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .switch-auth-text:hover {
+            text-decoration: underline;
+        }
+
+        .auth-info {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: var(--bg-color);
+        }
+
+        .auth-info-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* پیکر تاریخ و زمان */
+        .picker-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            display: none;
+        }
+
+        .picker-container {
+            background-color: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 400px;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .picker-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .picker-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .date-display {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .date-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .picker-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .picker-button {
+            flex: 1;
+            padding: 12px 0;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .cancel-button {
+            background-color: #e0e0e0;
+            color: #666;
+        }
+
+        .confirm-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* پیکر زمان */
+        .time-picker-content {
+            display: flex;
+            justify-content: space-between;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+
+        .time-scroll {
+            flex: 1;
+            margin: 0 5px;
+            overflow-y: auto;
+        }
+
+        .time-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .time-option {
+            padding: 8px 10px;
+            margin-bottom: 2px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            transition: var(--transition);
+        }
+
+        .time-option:hover {
+            background-color: #e9e9e9;
+        }
+
+        .time-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .ampm-container {
+            flex: 0.5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ampm-button {
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            width: 80%;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .ampm-button.selected {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* رسپانسیو */
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 20px;
+            }
+            
+            .datetime-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .priority-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .menu-container {
+                width: 280px;
+            }
+            
+            .picker-container {
+                max-height: 350px;
+            }
+            
+            .time-picker-content {
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .add-form {
+                padding: 15px;
+            }
+            
+            .task-item {
+                padding: 12px;
+            }
+            
+            .task-title {
+                font-size: 15px;
+            }
+            
+            .menu-container {
+                width: 250px;
+                padding: 50px 15px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- صفحه بارگذاری -->
+    <div class="loading-container" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">در حال بارگذاری...</div>
+    </div>
+
+    <!-- محتوای اصلی -->
+    <div id="app" style="display: none;">
+        <!-- هدر -->
+        <header class="header">
+            <div class="header-content">
+                <button class="menu-button" onclick="window.openMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="header-info">
+                    <h1 class="header-title">📝 مدیریت کارها</h1>
+                    <p class="header-subtitle" id="headerSubtitle">کاربر مهمان • 0 کار فعال</p>
+                </div>
+                
+                <button class="theme-button" onclick="window.toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- محتوای اصلی -->
+        <div class="container">
+            <!-- فرم افزودن کار -->
+            <section class="add-form">
+                <h2 class="form-title">اضافه کردن کار جدید</h2>
+                
+                <div class="input-row">
+                    <input type="text" class="task-input" id="taskInput" placeholder="عنوان کار را وارد کنید..." onkeypress="if(event.key === 'Enter') window.addTask()">
+                    <button class="add-button" id="addButton" onclick="window.addTask()" disabled>
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <textarea class="description-input" id="descriptionInput" placeholder="توضیحات (اختیاری)..."></textarea>
+                
+                <label class="label">دسته‌بندی:</label>
+                <div class="category-scroll">
+                    <!-- دسته‌بندی‌ها با اسکریپت اضافه می‌شوند -->
+                </div>
+                
+                <label class="label">اولویت:</label>
+                <div class="priority-container">
+                    <!-- اولویت‌ها با اسکریپت اضافه می‌شوند -->
+                </div>
+                
+                <div class="datetime-container">
+                    <div class="datetime-column">
+                        <label class="label">تاریخ:</label>
+                        <button class="date-button" onclick="window.openDatePicker()">
+                            <i class="fas fa-calendar"></i>
+                            <span id="dateDisplay">انتخاب تاریخ</span>
+                        </button>
+                    </div>
+                    
+                    <div class="datetime-column">
+                        <label class="label">ساعت:</label>
+                        <button class="date-button" onclick="window.openTimePicker()">
+                            <i class="fas fa-clock"></i>
+                            <span id="timeDisplay">انتخاب زمان</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- فیلترها -->
+            <div class="filter-scroll">
+                <!-- فیلترها با اسکریپت اضافه می‌شوند -->
+            </div>
+
+            <!-- لیست کارها -->
+            <section class="task-list">
+                <div class="list-header-row">
+                    <div class="list-header" id="taskCount">0 کار پیدا شد</div>
+                    <div class="save-warning" id="saveWarning" style="display: none;">
+                        <i class="fas fa-cloud"></i>
+                        <span>ذخیره موقت</span>
+                    </div>
+                </div>
+                
+                <div id="tasksContainer">
+                    <!-- کارها اینجا نمایش داده می‌شوند -->
+                </div>
+                
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-clipboard-text-outline"></i>
+                    <h3 class="empty-state-title">هنوز کاری اضافه نکردید!</h3>
+                    <p class="empty-state-subtitle">یک کار جدید اضافه کنید</p>
+                    <div class="guest-warning" id="guestWarning" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="guest-warning-text">برای ذخیره دائمی کارها، لطفاً وارد حساب کاربری شوید</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- منوی کشویی -->
+        <div class="menu-overlay" id="menuOverlay">
+            <div class="menu-backdrop" onclick="window.closeMenu()"></div>
+            <div class="menu-container" id="menuContainer">
+                <!-- محتوای منو -->
+            </div>
+        </div>
+
+        <!-- پیکر تاریخ -->
+        <div class="picker-overlay" id="datePickerOverlay">
+            <div class="picker-container">
+                <div class="picker-header">
+                    <h3 class="picker-title">انتخاب تاریخ</h3>
+                    <button class="picker-close" onclick="window.closeDatePicker()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="date-display">
+                    <div class="date-text" id="selectedDateDisplay">تاریخ انتخاب نشده</div>
+                </div>
+                
+                <div class="picker-buttons">
+                    <button class="picker-button cancel-button" onclick="window.closeDatePicker()">لغو</button>
+                    <button class="picker-button confirm-button" onclick="window.confirmDate()">تأیید</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- پیکر زمان -->
+        <div class="picker-overlay" id="timePickerOverlay">
+            <div class="picker-container">
+                <div class="picker-header">
+                    <h3 class="picker-title">انتخاب زمان</h3>
+                    <button class="picker-close" onclick="window.closeTimePicker()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="time-picker-content">
+                    <div class="time-scroll" id="hoursScroll">
+                        <div class="time-label">ساعت:</div>
+                        <!-- ساعت‌ها اینجا اضافه می‌شوند -->
+                    </div>
+                    
+                    <div class="time-scroll" id="minutesScroll">
+                        <div class="time-label">دقیقه:</div>
+                        <!-- دقیقه‌ها اینجا اضافه می‌شوند -->
+                    </div>
+                    
+                    <div class="ampm-container">
+                        <div class="ampm-button" onclick="window.selectAmPm(false)" id="amButton">ق.ظ</div>
+                        <div class="ampm-button" onclick="window.selectAmPm(true)" id="pmButton">ب.ظ</div>
+                    </div>
+                </div>
+                
+                <div class="picker-buttons">
+                    <button class="picker-button cancel-button" onclick="window.closeTimePicker()">لغو</button>
+                    <button class="picker-button confirm-button" onclick="window.confirmTime()">تأیید</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // رنگ‌ها
+        const COLORS = {
+            light: {
+                background: '#F5F7FA',
+                card: '#FFFFFF',
+                text: '#2D3748',
+                textSecondary: '#718096',
+                border: '#E2E8F0',
+                primary: '#4F46E5',
+                success: '#10B981',
+                warning: '#F59E0B',
+                danger: '#EF4444',
+                purple: '#8B5CF6',
+                pink: '#EC4899',
+                blue: '#3B82F6',
+                green: '#10B981',
+                yellow: '#F59E0B',
+                orange: '#F97316',
+            },
+            dark: {
+                background: '#1A202C',
+                card: '#2D3748',
+                text: '#F7FAFC',
+                textSecondary: '#CBD5E0',
+                border: '#4A5568',
+                primary: '#6366F1',
+                success: '#34D399',
+                warning: '#FBBF24',
+                danger: '#F87171',
+                purple: '#A78BFA',
+                pink: '#F472B6',
+                blue: '#60A5FA',
+                green: '#34D399',
+                yellow: '#FBBF24',
+                orange: '#FB923C',
+            }
+        };
+
+        // وضعیت برنامه
+        let state = {
+            user: null,
+            tasks: [],
+            newTask: '',
+            taskDescription: '',
+            taskCategory: 'کار',
+            priority: 'متوسط',
+            dueDate: '',
+            dueTime: '',
+            filter: 'همه',
+            darkMode: false,
+            showDatePicker: false,
+            showTimePicker: false,
+            showMenu: false,
+            loading: true,
+            selectedDate: new Date(),
+            timeHour: '12',
+            timeMinute: '00',
+            timeIsPM: false
+        };
+
+        // متغیرهای DOM
+        let loadingEl, appEl, headerSubtitleEl, taskInputEl, addButtonEl, descriptionInputEl, 
+            dateDisplayEl, timeDisplayEl, tasksContainerEl, emptyStateEl, guestWarningEl, 
+            saveWarningEl, taskCountEl, menuOverlayEl, menuContainerEl, datePickerOverlayEl, 
+            timePickerOverlayEl, selectedDateDisplayEl, hoursScrollEl, minutesScrollEl, 
+            amButtonEl, pmButtonEl, categoryScrollEl, priorityContainerEl, filterScrollEl;
+
+        // مقداردهی اولیه
+        function init() {
+            // گرفتن عناصر DOM
+            loadingEl = document.getElementById('loading');
+            appEl = document.getElementById('app');
+            headerSubtitleEl = document.getElementById('headerSubtitle');
+            taskInputEl = document.getElementById('taskInput');
+            addButtonEl = document.getElementById('addButton');
+            descriptionInputEl = document.getElementById('descriptionInput');
+            dateDisplayEl = document.getElementById('dateDisplay');
+            timeDisplayEl = document.getElementById('timeDisplay');
+            tasksContainerEl = document.getElementById('tasksContainer');
+            emptyStateEl = document.getElementById('emptyState');
+            guestWarningEl = document.getElementById('guestWarning');
+            saveWarningEl = document.getElementById('saveWarning');
+            taskCountEl = document.getElementById('taskCount');
+            menuOverlayEl = document.getElementById('menuOverlay');
+            menuContainerEl = document.getElementById('menuContainer');
+            datePickerOverlayEl = document.getElementById('datePickerOverlay');
+            timePickerOverlayEl = document.getElementById('timePickerOverlay');
+            selectedDateDisplayEl = document.getElementById('selectedDateDisplay');
+            hoursScrollEl = document.getElementById('hoursScroll');
+            minutesScrollEl = document.getElementById('minutesScroll');
+            amButtonEl = document.getElementById('amButton');
+            pmButtonEl = document.getElementById('pmButton');
+            categoryScrollEl = document.querySelector('.category-scroll');
+            priorityContainerEl = document.querySelector('.priority-container');
+            filterScrollEl = document.querySelector('.filter-scroll');
+
+            // بارگذاری داده‌ها
+            loadUserData();
+            
+            // مخفی کردن صفحه بارگذاری
+            setTimeout(() => {
+                loadingEl.style.display = 'none';
+                appEl.style.display = 'block';
+                state.loading = false;
+                render();
+            }, 1000);
+            
+            // تنظیم رویدادها
+            setupEventListeners();
+        }
+
+        // بارگذاری داده کاربر
+        function loadUserData() {
+            try {
+                const userData = localStorage.getItem('currentUser');
+                if (userData) {
+                    state.user = JSON.parse(userData);
+                    loadUserTasks(state.user.email);
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری داده کاربر:', error);
+            }
+        }
+
+        // بارگذاری کارهای کاربر
+        function loadUserTasks(email) {
+            try {
+                const userData = localStorage.getItem(`user_${email}`);
+                if (userData) {
+                    const parsedData = JSON.parse(userData);
+                    state.tasks = parsedData.tasks || [];
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری کارها:', error);
+            }
+        }
+
+        // ذخیره کارهای کاربر
+        function saveUserTasks(tasksArray) {
+            if (!state.user) return;
+            
+            try {
+                const userData = localStorage.getItem(`user_${state.user.email}`);
+                if (userData) {
+                    const parsedData = JSON.parse(userData);
+                    parsedData.tasks = tasksArray;
+                    localStorage.setItem(`user_${state.user.email}`, JSON.stringify(parsedData));
+                    
+                    // به‌روزرسانی داده کاربر فعلی
+                    const updatedUser = { ...state.user, tasks: tasksArray };
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    state.user = updatedUser;
+                }
+            } catch (error) {
+                console.error('خطا در ذخیره کارها:', error);
+            }
+        }
+
+        // تنظیم رویدادها
+        function setupEventListeners() {
+            // تغییرات در فیلد ورود کار
+            taskInputEl.addEventListener('input', (e) => {
+                state.newTask = e.target.value;
+                addButtonEl.disabled = !state.newTask.trim();
+            });
+            
+            // تغییرات در فیلد توضیحات
+            descriptionInputEl.addEventListener('input', (e) => {
+                state.taskDescription = e.target.value;
+            });
+        }
+
+        // رندر کلی
+        function render() {
+            // به‌روزرسانی زیرعنوان هدر
+            updateHeader();
+            
+            // رندر دسته‌بندی‌ها
+            renderCategories();
+            
+            // رندر اولویت‌ها
+            renderPriorities();
+            
+            // رندر فیلترها
+            renderFilters();
+            
+            // رندر کارها
+            renderTasks();
+            
+            // به‌روزرسانی نمایش ذخیره
+            updateSaveWarning();
+        }
+
+        // به‌روزرسانی هدر
+        function updateHeader() {
+            const stats = getStats();
+            headerSubtitleEl.textContent = state.user 
+                ? `${state.user.name} • ${stats.active} کار فعال` 
+                : `کاربر مهمان • ${stats.active} کار فعال`;
+        }
+
+        // رندر دسته‌بندی‌ها
+        function renderCategories() {
+            const categories = ['کار', 'شخصی', 'خرید', 'سلامتی', 'آموزش', 'پروژه'];
+            categoryScrollEl.innerHTML = '';
+            
+            categories.forEach(category => {
+                const categoryColor = getCategoryColor(category);
+                const categoryIcon = getCategoryIcon(category);
+                
+                const option = document.createElement('div');
+                option.className = `category-option ${state.taskCategory === category ? 'active' : ''}`;
+                option.style.borderColor = state.taskCategory === category ? categoryColor : '';
+                option.style.backgroundColor = state.taskCategory === category ? categoryColor : '';
+                option.style.color = state.taskCategory === category ? 'white' : '';
+                
+                option.innerHTML = `
+                    <i class="fas fa-${categoryIcon}"></i>
+                    <span>${category}</span>
+                `;
+                
+                option.addEventListener('click', () => {
+                    state.taskCategory = category;
+                    renderCategories();
+                });
+                
+                categoryScrollEl.appendChild(option);
+            });
+        }
+
+        // رندر اولویت‌ها
+        function renderPriorities() {
+            const priorities = ['پایین', 'متوسط', 'بالا'];
+            priorityContainerEl.innerHTML = '';
+            
+            priorities.forEach(priority => {
+                const priorityColor = getPriorityColor(priority);
+                
+                const option = document.createElement('div');
+                option.className = `priority-option ${state.priority === priority ? 'active' : ''}`;
+                option.style.borderColor = state.priority === priority ? priorityColor : '';
+                option.style.backgroundColor = state.priority === priority ? `${priorityColor}20` : '';
+                
+                option.innerHTML = `
+                    <div class="priority-dot" style="background-color: ${priorityColor};"></div>
+                    <span style="color: ${state.priority === priority ? priorityColor : 'inherit'}">${priority}</span>
+                `;
+                
+                option.addEventListener('click', () => {
+                    state.priority = priority;
+                    renderPriorities();
+                });
+                
+                priorityContainerEl.appendChild(option);
+            });
+        }
+
+        // رندر فیلترها
+        function renderFilters() {
+            const filters = ['همه', 'فعال', 'تکمیل‌شده', 'امروز'];
+            filterScrollEl.innerHTML = '';
+            
+            filters.forEach(filter => {
+                const button = document.createElement('button');
+                button.className = `filter-button ${state.filter === filter ? 'active' : ''}`;
+                button.textContent = filter;
+                button.dataset.filter = filter;
+                
+                button.addEventListener('click', () => {
+                    state.filter = filter;
+                    renderFilters();
+                    renderTasks();
+                });
+                
+                filterScrollEl.appendChild(button);
+            });
+        }
+
+        // رندر کارها
+        function renderTasks() {
+            const filteredTasks = getFilteredTasks();
+            const stats = getStats();
+            
+            taskCountEl.textContent = `${filteredTasks.length} کار پیدا شد`;
+            
+            if (filteredTasks.length === 0) {
+                tasksContainerEl.innerHTML = '';
+                emptyStateEl.style.display = 'flex';
+                
+                // به‌روزرسانی پیام حالت خالی
+                const title = emptyStateEl.querySelector('.empty-state-title');
+                const subtitle = emptyStateEl.querySelector('.empty-state-subtitle');
+                
+                if (state.filter === 'همه') {
+                    title.textContent = 'هنوز کاری اضافه نکردید!';
+                    subtitle.textContent = 'یک کار جدید اضافه کنید';
+                } else if (state.filter === 'تکمیل‌شده') {
+                    title.textContent = 'کاری تکمیل نشده!';
+                    subtitle.textContent = 'کارهای خود را به اتمام برسانید';
+                } else if (state.filter === 'امروز') {
+                    title.textContent = 'کاری برای امروز ندارید!';
+                    subtitle.textContent = 'کارهای امروز را برنامه‌ریزی کنید';
+                } else {
+                    title.textContent = 'هیچ کاری فعال نیست!';
+                    subtitle.textContent = 'همه کارهایتان را انجام داده‌اید';
+                }
+            } else {
+                emptyStateEl.style.display = 'none';
+                
+                // ایجاد HTML کارها
+                let tasksHTML = '';
+                
+                filteredTasks.forEach(task => {
+                    const categoryColor = getCategoryColor(task.category);
+                    const categoryIcon = getCategoryIcon(task.category);
+                    const priorityColor = getPriorityColor(task.priority);
+                    
+                    tasksHTML += `
+                        <div class="task-item" data-id="${task.id}">
+                            <div class="checkbox" onclick="window.toggleTaskCompletion('${task.id}')" style="color: ${task.isCompleted ? getCurrentColors().success : categoryColor}">
+                                <i class="fas ${task.isCompleted ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            </div>
+                            
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title ${task.isCompleted ? 'completed' : ''}">
+                                        ${task.title}
+                                    </div>
+                                    <div class="category-badge" style="background-color: ${categoryColor}20; color: ${categoryColor}">
+                                        <i class="fas fa-${categoryIcon}"></i>
+                                        <span>${task.category}</span>
+                                    </div>
+                                </div>
+                                
+                                ${task.description ? `
+                                    <div class="task-description">${task.description}</div>
+                                ` : ''}
+                                
+                                <div class="task-footer">
+                                    <div class="task-meta">
+                                        <div class="meta-item">
+                                            <div class="priority-dot-small" style="background-color: ${priorityColor}"></div>
+                                            <span>${task.priority}</span>
+                                        </div>
+                                        <div class="meta-item">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>${formatDate(task.dueDate)}</span>
+                                        </div>
+                                        <div class="meta-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>${task.dueTime}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="delete-button" onclick="window.deleteTask('${task.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                tasksContainerEl.innerHTML = tasksHTML;
+            }
+        }
+
+        // به‌روزرسانی هشدار ذخیره
+        function updateSaveWarning() {
+            if (state.user) {
+                saveWarningEl.style.display = 'none';
+                guestWarningEl.style.display = 'none';
+            } else {
+                saveWarningEl.style.display = 'flex';
+                guestWarningEl.style.display = 'flex';
+            }
+        }
+
+        // دریافت رنگ دسته‌بندی
+        function getCategoryColor(category) {
+            const colors = getCurrentColors();
+            const categoryColors = {
+                'کار': colors.purple,
+                'شخصی': colors.pink,
+                'خرید': colors.blue,
+                'سلامتی': colors.green,
+                'آموزش': colors.yellow,
+                'پروژه': colors.orange,
+            };
+            return categoryColors[category] || colors.primary;
+        }
+
+        // دریافت آیکون دسته‌بندی
+        function getCategoryIcon(category) {
+            const icons = {
+                'کار': 'briefcase',
+                'شخصی': 'user',
+                'خرید': 'shopping-cart',
+                'سلامتی': 'heart',
+                'آموزش': 'graduation-cap',
+                'پروژه': 'clipboard-check',
+            };
+            return icons[category] || 'circle';
+        }
+
+        // دریافت رنگ اولویت
+        function getPriorityColor(priority) {
+            const colors = getCurrentColors();
+            if (priority === 'بالا') return colors.danger;
+            if (priority === 'متوسط') return colors.warning;
+            return colors.success;
+        }
+
+        // دریافت رنگ‌های فعلی
+        function getCurrentColors() {
+            return state.darkMode ? COLORS.dark : COLORS.light;
+        }
+
+        // فرمت تاریخ
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fa-IR');
+        }
+
+        // فیلتر کارها
+        function getFilteredTasks() {
+            return state.tasks.filter(task => {
+                switch (state.filter) {
+                    case 'فعال':
+                        return !task.isCompleted;
+                    case 'تکمیل‌شده':
+                        return task.isCompleted;
+                    case 'امروز':
+                        const today = new Date().toISOString().split('T')[0];
+                        return task.dueDate === today;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // آمار
+        function getStats() {
+            return {
+                total: state.tasks.length,
+                completed: state.tasks.filter(t => t.isCompleted).length,
+                active: state.tasks.filter(t => !t.isCompleted).length,
+            };
+        }
+
+        // توابع عمومی
+
+        // افزودن کار
+        window.addTask = function() {
+            if (!state.newTask.trim()) {
+                alert('خطا: لطفا عنوان کار را وارد کنید');
+                return;
+            }
+
+            const newTaskObj = {
+                id: Date.now().toString(),
+                title: state.newTask.trim(),
+                description: state.taskDescription.trim(),
+                category: state.taskCategory,
+                priority: state.priority,
+                isCompleted: false,
+                dueDate: state.dueDate || new Date().toISOString().split('T')[0],
+                dueTime: state.dueTime || '12:00',
+                createdAt: new Date().toISOString(),
+                userId: state.user ? state.user.id : 'guest',
+            };
+
+            const updatedTasks = [newTaskObj, ...state.tasks];
+            state.tasks = updatedTasks;
+            
+            if (state.user) {
+                saveUserTasks(updatedTasks);
+            }
+            
+            // ریست فرم
+            state.newTask = '';
+            state.taskDescription = '';
+            state.taskCategory = 'کار';
+            state.priority = 'متوسط';
+            state.dueDate = '';
+            state.dueTime = '';
+            
+            taskInputEl.value = '';
+            descriptionInputEl.value = '';
+            dateDisplayEl.textContent = 'انتخاب تاریخ';
+            timeDisplayEl.textContent = 'انتخاب زمان';
+            addButtonEl.disabled = true;
+            
+            // رندر مجدد
+            renderCategories();
+            renderPriorities();
+            render();
+            
+            alert('موفقیت: کار جدید با موفقیت اضافه شد!');
+        };
+
+        // تغییر وضعیت تکمیل کار
+        window.toggleTaskCompletion = function(id) {
+            const updatedTasks = state.tasks.map(task => 
+                task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
+            );
+            state.tasks = updatedTasks;
+            
+            if (state.user) {
+                saveUserTasks(updatedTasks);
+            }
+            
+            renderTasks();
+        };
+
+        // حذف کار
+        window.deleteTask = function(id) {
+            if (confirm('آیا مطمئنید که می‌خواهید این کار را حذف کنید؟')) {
+                const updatedTasks = state.tasks.filter(task => task.id !== id);
+                state.tasks = updatedTasks;
+                
+                if (state.user) {
+                    saveUserTasks(updatedTasks);
+                }
+                
+                render();
+            }
+        };
+
+        // باز کردن منو
+        window.openMenu = function() {
+            menuOverlayEl.style.display = 'block';
+            setTimeout(() => {
+                menuContainerEl.classList.add('show');
+            }, 10);
+            renderMenu();
+        };
+
+        // بستن منو
+        window.closeMenu = function() {
+            menuContainerEl.classList.remove('show');
+            setTimeout(() => {
+                menuOverlayEl.style.display = 'none';
+            }, 300);
+        };
+
+        // رندر منو
+        function renderMenu() {
+            let menuHTML = '';
+            
+            if (state.user) {
+                // منوی کاربر واردشده
+                menuHTML = `
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="user-name">${state.user.name}</div>
+                        <div class="user-email">${state.user.email}</div>
+                        <div class="user-stats">${state.user.tasks?.length || 0} کار ثبت شده</div>
+                    </div>
+                    
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <i class="fas fa-cog"></i>
+                            <div class="menu-item-text">تنظیمات</div>
+                        </div>
+                        <div class="menu-item">
+                            <i class="fas fa-bell"></i>
+                            <div class="menu-item-text">اعلان‌ها</div>
+                        </div>
+                        <div class="menu-item">
+                            <i class="fas fa-question-circle"></i>
+                            <div class="menu-item-text">راهنما</div>
+                        </div>
+                        <div class="menu-item">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="menu-item-text">درباره ما</div>
+                        </div>
+                    </div>
+                    
+                    <button class="logout-button" onclick="window.handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>خروج از حساب</span>
+                    </button>
+                `;
+            } else {
+                // منوی احراز هویت
+                menuHTML = `
+                    <div class="auth-menu">
+                        <div class="menu-header">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="menu-title">ورود به حساب</div>
+                        </div>
+                        
+                        <div class="input-container">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" class="menu-input" id="menuEmail" placeholder="ایمیل">
+                        </div>
+                        
+                        <div class="input-container">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="menu-input" id="menuPassword" placeholder="رمز عبور">
+                        </div>
+                        
+                        <button class="menu-auth-button" id="loginButton" onclick="window.handleAuth()">ورود</button>
+                        
+                        <div class="switch-auth-button">
+                            <div class="switch-auth-text" onclick="window.switchAuthMode()">
+                                حساب کاربری ندارید؟ ثبت‌نام کنید
+                            </div>
+                        </div>
+                        
+                        <div class="auth-info">
+                            <div class="auth-info-text">• رمز عبور باید حداقل ۶ کاراکتر باشد</div>
+                            <div class="auth-info-text">• از ایمیل معتبر استفاده کنید</div>
+                            <div class="auth-info-text">• برای تست: test@test.com / 123456</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            menuContainerEl.innerHTML = menuHTML;
+        }
+
+        // تغییر حالت احراز هویت
+        window.switchAuthMode = function() {
+            const menuTitle = menuContainerEl.querySelector('.menu-title');
+            const loginButton = menuContainerEl.querySelector('.menu-auth-button');
+            const switchAuthText = menuContainerEl.querySelector('.switch-auth-text');
+            const emailInput = menuContainerEl.querySelector('#menuEmail');
+            const passwordInput = menuContainerEl.querySelector('#menuPassword');
+            
+            let isLogin = true;
+            
+            if (menuTitle.textContent === 'ورود به حساب') {
+                // تغییر به ثبت‌نام
+                menuTitle.textContent = 'ایجاد حساب';
+                loginButton.textContent = 'ثبت‌نام';
+                switchAuthText.textContent = 'قبلاً ثبت‌نام کرده‌اید؟ وارد شوید';
+                
+                // افزودن فیلد نام
+                const nameHTML = `
+                    <div class="input-container">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" class="menu-input" id="menuName" placeholder="نام و نام خانوادگی">
+                    </div>
+                `;
+                emailInput.insertAdjacentHTML('beforebegin', nameHTML);
+                
+                // افزودن فیلد تأیید رمز عبور
+                const confirmHTML = `
+                    <div class="input-container">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" class="menu-input" id="menuConfirmPassword" placeholder="تکرار رمز عبور">
+                    </div>
+                `;
+                passwordInput.insertAdjacentHTML('afterend', confirmHTML);
+                
+                isLogin = false;
+            } else {
+                // تغییر به ورود
+                menuTitle.textContent = 'ورود به حساب';
+                loginButton.textContent = 'ورود';
+                switchAuthText.textContent = 'حساب کاربری ندارید؟ ثبت‌نام کنید';
+                
+                // حذف فیلدهای اضافی
+                const nameInput = menuContainerEl.querySelector('#menuName');
+                const confirmInput = menuContainerEl.querySelector('#menuConfirmPassword');
+                if (nameInput) nameInput.parentElement.remove();
+                if (confirmInput) confirmInput.parentElement.remove();
+                
+                isLogin = true;
+            }
+            
+            // ذخیره حالت
+            window.currentAuthMode = isLogin;
+        };
+
+        // مدیریت احراز هویت
+        window.handleAuth = function() {
+            const email = document.getElementById('menuEmail')?.value.trim();
+            const password = document.getElementById('menuPassword')?.value.trim();
+            
+            if (!email || !password) {
+                alert('خطا: لطفا ایمیل و رمز عبور را وارد کنید');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('خطا: لطفا یک ایمیل معتبر وارد کنید');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('خطا: رمز عبور باید حداقل ۶ کاراکتر باشد');
+                return;
+            }
+            
+            const isLogin = window.currentAuthMode !== false;
+            
+            if (!isLogin) {
+                // ثبت‌نام
+                const name = document.getElementById('menuName')?.value.trim();
+                const confirmPassword = document.getElementById('menuConfirmPassword')?.value.trim();
+                
+                if (!name) {
+                    alert('خطا: لطفا نام خود را وارد کنید');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('خطا: رمز عبور و تأیید آن مطابقت ندارند');
+                    return;
+                }
+                
+                // بررسی وجود کاربر
+                const existingUser = localStorage.getItem(`user_${email}`);
+                if (existingUser) {
+                    alert('خطا: این ایمیل قبلاً ثبت شده است');
+                    return;
+                }
+                
+                // ایجاد کاربر
+                const userData = {
+                    id: Date.now().toString(),
+                    email,
+                    password,
+                    name,
+                    createdAt: new Date().toISOString(),
+                    tasks: []
+                };
+                
+                localStorage.setItem(`user_${email}`, JSON.stringify(userData));
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                
+                window.handleSignup(userData);
+            } else {
+                // ورود
+                const user = localStorage.getItem(`user_${email}`);
+                if (!user) {
+                    alert('خطا: کاربری با این ایمیل وجود ندارد');
+                    return;
+                }
+                
+                const userData = JSON.parse(user);
+                if (userData.password !== password) {
+                    alert('خطا: رمز عبور اشتباه است');
+                    return;
+                }
+                
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                window.handleLogin(userData);
+            }
+        };
+
+        // ورود کاربر
+        window.handleLogin = function(userData) {
+            state.user = userData;
+            state.tasks = userData.tasks || [];
+            alert(`موفقیت: خوش آمدید ${userData.name}!`);
+            window.closeMenu();
+            render();
+        };
+
+        // ثبت‌نام کاربر
+        window.handleSignup = function(userData) {
+            state.user = userData;
+            state.tasks = [];
+            alert('موفقیت: حساب کاربری با موفقیت ایجاد شد!');
+            window.closeMenu();
+            render();
+        };
+
+        // خروج کاربر
+        window.handleLogout = function() {
+            if (confirm('آیا مطمئنید که می‌خواهید از حساب کاربری خارج شوید؟')) {
+                localStorage.removeItem('currentUser');
+                state.user = null;
+                state.tasks = [];
+                window.closeMenu();
+                render();
+            }
+        };
+
+        // تغییر حالت تاریک/روشن
+        window.toggleTheme = function() {
+            state.darkMode = !state.darkMode;
+            document.body.classList.toggle('dark-mode', state.darkMode);
+            
+            // تغییر آیکون
+            const icon = document.querySelector('.theme-button i');
+            icon.className = state.darkMode ? 'fas fa-sun' : 'fas fa-moon';
+            
+            // ذخیره حالت
+            localStorage.setItem('darkMode', state.darkMode);
+            
+            // رندر مجدد برای اعمال رنگ‌ها
+            render();
+        };
+
+        // بارگذاری حالت تاریک ذخیره شده
+        function loadDarkMode() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                state.darkMode = true;
+                document.body.classList.add('dark-mode');
+                const icon = document.querySelector('.theme-button i');
+                if (icon) icon.className = 'fas fa-sun';
+            }
+        }
+
+        // مدیریت پیکر تاریخ
+        window.openDatePicker = function() {
+            datePickerOverlayEl.style.display = 'flex';
+            selectedDateDisplayEl.textContent = formatDate(state.selectedDate.toISOString().split('T')[0]);
+        };
+
+        window.closeDatePicker = function() {
+            datePickerOverlayEl.style.display = 'none';
+        };
+
+        window.confirmDate = function() {
+            const dateStr = state.selectedDate.toISOString().split('T')[0];
+            state.dueDate = dateStr;
+            dateDisplayEl.textContent = formatDate(dateStr);
+            window.closeDatePicker();
+        };
+
+        // مدیریت پیکر زمان
+        window.openTimePicker = function() {
+            timePickerOverlayEl.style.display = 'flex';
+            
+            // ایجاد ساعت‌ها
+            let hoursHTML = '<div class="time-label">ساعت:</div>';
+            for (let i = 1; i <= 12; i++) {
+                const hour = i.toString().padStart(2, '0');
+                hoursHTML += `<div class="time-option ${state.timeHour === hour ? 'selected' : ''}" onclick="window.selectHour('${hour}')">${hour}</div>`;
+            }
+            hoursScrollEl.innerHTML = hoursHTML;
+            
+            // ایجاد دقیقه‌ها
+            let minutesHTML = '<div class="time-label">دقیقه:</div>';
+            for (let i = 0; i < 60; i++) {
+                const minute = i.toString().padStart(2, '0');
+                minutesHTML += `<div class="time-option ${state.timeMinute === minute ? 'selected' : ''}" onclick="window.selectMinute('${minute}')">${minute}</div>`;
+            }
+            minutesScrollEl.innerHTML = minutesHTML;
+            
+            // به‌روزرسانی دکمه‌های ق.ظ/ب.ظ
+            updateAmPmButtons();
+        };
+
+        window.closeTimePicker = function() {
+            timePickerOverlayEl.style.display = 'none';
+        };
+
+        window.selectHour = function(hour) {
+            state.timeHour = hour;
+            window.openTimePicker(); // رندر مجدد
+        };
+
+        window.selectMinute = function(minute) {
+            state.timeMinute = minute;
+            window.openTimePicker(); // رندر مجدد
+        };
+
+        window.selectAmPm = function(isPM) {
+            state.timeIsPM = isPM;
+            updateAmPmButtons();
+        };
+
+        window.confirmTime = function() {
+            const hour24 = state.timeIsPM ? (parseInt(state.timeHour) + 12) : parseInt(state.timeHour);
+            const timeString = `${hour24.toString().padStart(2, '0')}:${state.timeMinute}`;
+            state.dueTime = timeString;
+            timeDisplayEl.textContent = timeString;
+            window.closeTimePicker();
+        };
+
+        function updateAmPmButtons() {
+            if (state.timeIsPM) {
+                amButtonEl.classList.remove('selected');
+                pmButtonEl.classList.add('selected');
+            } else {
+                amButtonEl.classList.add('selected');
+                pmButtonEl.classList.remove('selected');
+            }
+        }
+
+        // شروع برنامه
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
+            init();
+        });
+    </script>
+</body>
+</html>
